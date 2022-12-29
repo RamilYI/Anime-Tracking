@@ -94,7 +94,7 @@ internal static class AnilistScripts
     /// <returns>Сезон.</returns>
     private static AnimeSeason GetSeason(DateTime currentDate)
     {
-        if (currentDate.Month is 12 or < 3)
+        if (currentDate.Month is 1 or < 3)
         {
             return AnimeSeason.WINTER;
         }

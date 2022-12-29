@@ -2,8 +2,26 @@
 
 using AnimeTrackingApi;
 using AnimeTrackingApi.Dto;
+using AnimeTrackingConsole;
+using Quartz;
+using Quartz.Impl;
 
-var animeTracking = new AnimeTracking();
-var result = animeTracking.GetTitleSchedule("Chainsaw Man").Result;
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        var animeTracking = new AnimeTracking();
+        var result = animeTracking.GetTitleSchedule("Chainsaw Man").Result;
+        var dates = result.airingSchedule.edges.Select(x => x.node.getAiringAtUtc());
 
-Console.WriteLine("Hello, World!");
+        foreach (var date in dates)
+        {
+            var factory = new StdSchedulerFactory();
+            var scheduler = await factory.GetScheduler();
+            await scheduler.Start();
+            var job = JobBuilder.Create<TestJob>().Build();
+            var trigger = TriggerBuilder.Create().StartAt(date).Build();
+            await scheduler.ScheduleJob(job, trigger);
+        }
+    }
+}
