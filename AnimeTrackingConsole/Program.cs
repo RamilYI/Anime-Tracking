@@ -12,8 +12,8 @@ class Program
     {
         var animeTracking = new AnimeTracking();
         var result = animeTracking.GetTitleSchedule("Chainsaw Man").Result;
-        var dates = result.airingSchedule.edges.Select(x => x.node.getAiringAtUtc());
-
+        var dates = result?.airingSchedule.edges.Select(x => x.node.getAiringAtUtc());
+        
         foreach (var date in dates)
         {
             var factory = new StdSchedulerFactory();

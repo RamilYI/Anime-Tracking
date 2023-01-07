@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimeTrackingConsole", "Ani
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimeTrackingApi", "AnimeTrackingApi\AnimeTrackingApi.csproj", "{AF886A0B-4094-4D45-BD73-C77C88747C96}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp", "WebApp\WebApp.csproj", "{9E52393F-C0DC-40CD-881D-FD3D32027085}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimeTrackingWeb", "AnimeTrackingWeb\AnimeTrackingWeb.csproj", "{5C958E5C-97D0-4F89-ABD7-15EBDB0DBE4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,9 +20,9 @@ Global
 		{AF886A0B-4094-4D45-BD73-C77C88747C96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF886A0B-4094-4D45-BD73-C77C88747C96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF886A0B-4094-4D45-BD73-C77C88747C96}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9E52393F-C0DC-40CD-881D-FD3D32027085}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9E52393F-C0DC-40CD-881D-FD3D32027085}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9E52393F-C0DC-40CD-881D-FD3D32027085}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9E52393F-C0DC-40CD-881D-FD3D32027085}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C958E5C-97D0-4F89-ABD7-15EBDB0DBE4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C958E5C-97D0-4F89-ABD7-15EBDB0DBE4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C958E5C-97D0-4F89-ABD7-15EBDB0DBE4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C958E5C-97D0-4F89-ABD7-15EBDB0DBE4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
