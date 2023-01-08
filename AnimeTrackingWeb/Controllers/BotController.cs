@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using AnimeTrackingWeb.Services;
+using Quartz;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -10,15 +12,13 @@ namespace AnimeTrackingWeb.Controllers;
 public class BotController : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] Update update)
+    // [ValidateTelegramBot]
+    public async Task<IActionResult> Post([FromBody] Update update,
+        [FromServices] UpdateHandlers handleUpdateService,
+        [FromServices] ISchedulerFactory schedulerFactory,
+        CancellationToken cancellationToken)
     {
-        var client = new TelegramBotClient("{TOKEN}");
-
-        if (update.Type == Telegram.Bot.Types.Enums.UpdateType.Message)
-        {
-            await client.SendTextMessageAsync(update.Message.From.Id, "answer");
-        }
-
+        await handleUpdateService.HandleUpdateAsync(update, schedulerFactory, cancellationToken);
         return Ok();
     }
 }

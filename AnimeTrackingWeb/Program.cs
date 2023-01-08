@@ -1,7 +1,41 @@
 using AnimeTrackingWeb;
 using AnimeTrackingWeb.Controllers;
+using AnimeTrackingWeb.Services;
+using Quartz;
+using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Register named HttpClient to get benefits of IHttpClientFactory
+// and consume it with ITelegramBotClient typed client.
+// More read:
+//  https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests#typed-clients
+//  https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests
+builder.Services.AddHttpClient("telegram_bot_client")
+    .AddTypedClient<ITelegramBotClient>((httpClient, sp) =>
+    {
+        TelegramBotClientOptions options = new("{TOKEN}");
+        return new TelegramBotClient(options, httpClient);
+    });
+
+// Dummy business-logic service
+builder.Services.AddScoped<UpdateHandlers>();
+// Add the required Quartz.NET services
+builder.Services.AddQuartz(q =>  
+{
+    // Use a Scoped container to create jobs. I'll touch on this later
+    q.UseMicrosoftDependencyInjectionScopedJobFactory();
+});
+
+// Add the Quartz.NET hosted service
+
+builder.Services.AddQuartzHostedService(
+    q => q.WaitForJobsToComplete = true);
+// There are several strategies for completing asynchronous tasks during startup.
+// Some of them could be found in this article https://andrewlock.net/running-async-tasks-on-app-startup-in-asp-net-core-part-1/
+// We are going to use IHostedService to add and later remove Webhook
+builder.Services.AddHostedService<ConfigureWebhook>();
+
 
 // Add services to the container.
 
@@ -20,9 +54,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-// app.MapBotWebhookRoute<BotController>(route: "api/bot");
+// app.MapBotWebhookRoute<BotController>(route: "/api/bot");
 app.MapControllers();
-
+app.UseQuartz();
 app.Run();
