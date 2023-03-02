@@ -11,7 +11,7 @@ class Program
     static async Task Main(string[] args)
     {
         var animeTracking = new AnimeTracking();
-        var result = animeTracking.GetTitleSchedule("Chainsaw Man").Result;
+        var result = animeTracking.GetTitleSchedule("Titan").Result;
         var dates = result?.airingSchedule.edges.Select(x => x.node.getAiringAtUtc());
         
         foreach (var date in dates)

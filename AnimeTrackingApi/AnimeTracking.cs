@@ -18,6 +18,13 @@ public class AnimeTracking : IAnimeTracking
             return schedule;
         }
 
+        findTitle = season.media.FirstOrDefault(x => x.title.SearchTitleWithSimilarName(title));
+        if (findTitle != null)
+        {
+            var schedule = await this.GetSchedule(findTitle.id.Value);
+            return schedule;
+        }
+
         return null;
     }
 
