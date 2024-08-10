@@ -28,8 +28,9 @@ public class ConfigureWebhook : IHostedService
         // https://core.telegram.org/bots/api#setwebhook
         // If you'd like to make sure that the webhook was set by you, you can specify secret data
         // in the parameter secret_token. If specified, the request will contain a header
-        // "X-Telegram-Bot-Api-Secret-Token" with the secret token as content.
-        var webhookAddress = "{URL_WITH_ROUTE}";
+        // "X-Telegram-Bot-Api-Secret-Token" with the secret token as content.\
+        // "https://api.telegram.org/bot5845820795:AAG5Odw1IRlkrnDZNnbcOuLjlFOm3f7RGv0/setwebhook?url=https://c1bc-136-169-224-119.eu.ngrok.io/api/bot"
+        var webhookAddress = "https://fd52-145-255-8-224.ngrok-free.app/api/bot";
         _logger.LogInformation("Setting webhook: {WebhookAddress}", webhookAddress);
         await botClient.SetWebhookAsync(
             url: webhookAddress,

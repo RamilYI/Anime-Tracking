@@ -65,6 +65,11 @@ public class UpdateHandlers
             AnimeTracking _animetracking)
         {
             var result = _animetracking.GetTitleSchedule(titleName).Result;
+            if (result == null)
+            {
+                return await telegramBotClient.SendTextMessageAsync(message.Chat.Id, text: $"doesnt find anything.", cancellationToken: cancellationToken);
+
+            }
             var dates = result?.airingSchedule.edges.Select(x => x.node.getAiringAtUtc());
             
             var scheduler = await factory.GetScheduler();
