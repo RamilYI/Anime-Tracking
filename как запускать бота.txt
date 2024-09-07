@@ -1,0 +1,7 @@
+пока руки не дошли автоматизировать это дело, будет всё вручную
+1. запускаем непосредственно AnimeTrackingWeb
+2. cmd -> 
+	vk-tunnel --insecure=1 --http-protocol=https --ws-protocol=wss --host=localhost --port=5152
+3. https://api.telegram.org/bot5845820795:AAG5Odw1IRlkrnDZNnbcOuLjlFOm3f7RGv0/setwebhook?url=%полученные хттпс%/api/bot
+4. animetracking_telegrambot_frontend vite --host
+5. вставить network вариант в AnimeTrackingWeb.UpdateHandlersService Url

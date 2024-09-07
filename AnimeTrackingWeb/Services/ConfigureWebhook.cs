@@ -4,11 +4,13 @@ using Telegram.Bot.Types.Enums;
 
 namespace AnimeTrackingWeb.Services;
 
+/// <summary>
+/// Класс конфигурации вебхука.
+/// </summary>
 public class ConfigureWebhook : IHostedService
 {
     private readonly ILogger<ConfigureWebhook> _logger;
     private readonly IServiceProvider _serviceProvider;
-    // private readonly BotConfiguration _botConfig;
 
     public ConfigureWebhook(
         ILogger<ConfigureWebhook> logger,
@@ -16,7 +18,6 @@ public class ConfigureWebhook : IHostedService
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
-        // _botConfig = botOptions.Value;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -30,7 +31,7 @@ public class ConfigureWebhook : IHostedService
         // in the parameter secret_token. If specified, the request will contain a header
         // "X-Telegram-Bot-Api-Secret-Token" with the secret token as content.\
         // "https://api.telegram.org/bot5845820795:AAG5Odw1IRlkrnDZNnbcOuLjlFOm3f7RGv0/setwebhook?url=https://c1bc-136-169-224-119.eu.ngrok.io/api/bot"
-        var webhookAddress = "https://fd52-145-255-8-224.ngrok-free.app/api/bot";
+        var webhookAddress = "https://user86705793-5vyjlop5.wormhole.vk-apps.com/";
         _logger.LogInformation("Setting webhook: {WebhookAddress}", webhookAddress);
         await botClient.SetWebhookAsync(
             url: webhookAddress,

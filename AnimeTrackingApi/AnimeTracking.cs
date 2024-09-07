@@ -88,9 +88,4 @@ public class AnimeTracking : IAnimeTracking
 
         return season;
     }
-
-    public AnimeTracking()
-    {
-        // this.season = this.GetSeason().Result;
-    }
 }

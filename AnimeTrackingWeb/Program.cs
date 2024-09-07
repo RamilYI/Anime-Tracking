@@ -1,6 +1,7 @@
 using AnimeTrackingWeb;
 using AnimeTrackingWeb.Controllers;
 using AnimeTrackingWeb.Services;
+using Microsoft.AspNetCore.Cors;
 using Quartz;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -20,12 +21,8 @@ builder.Services.AddHttpClient("telegram_bot_client")
         return new TelegramBotClient(options, httpClient);
     });
 
-InlineKeyboardButton.WithWebApp("text", new WebAppInfo()
-{
-    Url = 
-})
 // Dummy business-logic service
-builder.Services.AddScoped<UpdateHandlers>();
+builder.Services.AddScoped<UpdateHandlersService>();
 // Add the required Quartz.NET services
 builder.Services.AddQuartz(q =>  
 {
@@ -58,10 +55,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 // app.UseHttpsRedirection();
 // app.UseAuthorization();
 app.MapBotWebhookRoute<BotController>(route: "/api/bot");
+app.MapPost("", context =>
+{
+    return Task.CompletedTask;
+});
 app.MapControllers();
 app.UseQuartz();
 app.Run();
