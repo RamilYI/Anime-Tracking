@@ -1,4 +1,7 @@
+using System.Text;
+using System.Web;
 using AnimeTrackingApi;
+using AnimeTrackingApi.Dto;
 using AnimeTrackingWeb.Jobs;
 using Quartz;
 using Quartz.Impl;
@@ -6,8 +9,20 @@ using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
-
 namespace AnimeTrackingWeb.Services;
+
+public class AnimeSeasonWebAppDto
+{
+    public int Id { get; set; }
+    
+    public string englishTitle { get; set; }
+    
+    public string nativeTitle { get; set; }
+    
+    public string romajiTitle { get; set; }
+    
+    public bool isEnabled { get; set; }
+}
 
 /// <summary>
 /// Сервис обновления запросов клиента.
@@ -65,8 +80,8 @@ public class UpdateHandlersService
             var action = words[0] switch
             {
                 "/findongoing" => FindOngoing(_botClient, message, cancellationToken, schedulerFactory, string.Join(' ', words.Skip(1)), _animeTracking),
-                "/findongoing2" => CheckButtons(_botClient, message),
-                "/checkButtons" => CheckButtons(_botClient, message),
+                "/findongoing2" => CheckButtons(_botClient, message, _animeTracking),
+                "/checkButtons" => CheckButtons(_botClient, message, _animeTracking),
             };
 
             static async Task<Message> FindOngoing(ITelegramBotClient telegramBotClient, Message message,
@@ -108,18 +123,17 @@ public class UpdateHandlersService
                 return await telegramBotClient.SendTextMessageAsync(message.Chat.Id, text: $"Excellent! Now you're subscribed to notifications of new {titleName} episodes.", cancellationToken: cancellationToken);
             }
         
-            static async Task<Message> CheckButtons(ITelegramBotClient botClient, Message message)
+            static async Task<Message> CheckButtons(ITelegramBotClient botClient, Message message,
+                AnimeTracking animeTracking)
             {
                 var keyBoardButton = new KeyboardButton("text")
                 {
                     WebApp = new WebAppInfo()
                     {
-                        Url = "https://192.168.0.103:5173/"
+                        Url = $"https://192.168.0.103:5173",
                     }
                 };
                 var inlineMarkup = new ReplyKeyboardMarkup(keyBoardButton);
-                botClient.OnApiResponseReceived += BotClientOnOnApiResponseReceived;
-                botClient.OnMakingApiRequest += BotClientOnOnMakingApiRequest;
                 return await botClient.SendTextMessageAsync(message.Chat.Id, "check buttons", replyMarkup: inlineMarkup);
             }
 
@@ -130,6 +144,24 @@ public class UpdateHandlersService
         {
             Console.WriteLine(e);
         }
+    }
+
+    private static IList<AnimeSeasonWebAppDto> ConvertSeasonToWebAppDtos(SeasonDto season)
+    {
+        var webAppDtos = new List<AnimeSeasonWebAppDto>();
+
+        foreach (var titleInformation in season.media)
+        {
+            webAppDtos.Add(new AnimeSeasonWebAppDto()
+            {
+                englishTitle = titleInformation.title.english,
+                nativeTitle = titleInformation.title.native,
+                romajiTitle = titleInformation.title.romaji,
+                Id = titleInformation.id.HasValue ? titleInformation.id.Value : 0,
+            });
+        }
+
+        return webAppDtos;
     }
 
     private static ValueTask BotClientOnOnMakingApiRequest(ITelegramBotClient botclient, ApiRequestEventArgs args, CancellationToken cancellationtoken)

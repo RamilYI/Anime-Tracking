@@ -1,3 +1,4 @@
+using AnimeTrackingApi;
 using AnimeTrackingWeb;
 using AnimeTrackingWeb.Controllers;
 using AnimeTrackingWeb.Services;
@@ -23,6 +24,7 @@ builder.Services.AddHttpClient("telegram_bot_client")
 
 // Dummy business-logic service
 builder.Services.AddScoped<UpdateHandlersService>();
+builder.Services.AddScoped<AnimeTracking>();
 // Add the required Quartz.NET services
 builder.Services.AddQuartz(q =>  
 {
@@ -55,13 +57,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-// app.UseHttpsRedirection();
-// app.UseAuthorization();
+app.UseHttpsRedirection();
+app.UseAuthorization();
 app.MapBotWebhookRoute<BotController>(route: "/api/bot");
-app.MapPost("", context =>
-{
-    return Task.CompletedTask;
-});
+app.MapBotWebhookRoute<GetBotController>(route: "/api/bot/test");
 app.MapControllers();
 app.UseQuartz();
 app.Run();

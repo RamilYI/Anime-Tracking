@@ -55,7 +55,7 @@ public class AnimeTracking : IAnimeTracking
         return new ScheduleDto();
     }
 
-    private async Task<SeasonDto> GetSeason()
+    public async Task<SeasonDto> GetSeason()
     {
         var client = new HttpClient();
         var season = new SeasonDto();

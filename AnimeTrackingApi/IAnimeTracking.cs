@@ -5,4 +5,6 @@ namespace AnimeTrackingApi;
 public interface IAnimeTracking
 {
     Task<ScheduleDto?> GetTitleSchedule(string title);
+
+    Task<SeasonDto> GetSeason();
 }
