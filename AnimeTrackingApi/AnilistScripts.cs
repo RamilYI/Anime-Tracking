@@ -59,6 +59,7 @@ internal static class AnilistScripts
                                                     "\n        month" +
                                                     "\n        day" +
                                                     "\n      }" +
+                                                    "\n      coverImage{\n        large\n      }" +
                                                     "\n    }" +
                                                     "\n  }" +
                                                     "\n}";

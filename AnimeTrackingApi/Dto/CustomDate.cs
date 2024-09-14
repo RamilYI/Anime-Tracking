@@ -1,5 +1,8 @@
 ﻿namespace AnimeTrackingApi.Dto;
 
+/// <summary>
+/// Дата.
+/// </summary>
 public class CustomDate
 {
     public int? year { get; set; }

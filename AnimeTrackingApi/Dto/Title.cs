@@ -1,5 +1,10 @@
 ﻿namespace AnimeTrackingApi.Dto;
 
+public class CoverImage
+{
+    public string? large { get; set; }
+}
+
 public class Title
 {
     // TODO усовершенствовать для поиска 

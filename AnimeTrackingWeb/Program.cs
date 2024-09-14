@@ -60,7 +60,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapBotWebhookRoute<BotController>(route: "/api/bot");
-app.MapBotWebhookRoute<GetBotController>(route: "/api/bot/test");
+app.MapBotWebhookRoute<GetSeasonController>(route: "/api/bot/getSeason");
 app.MapControllers();
 app.UseQuartz();
 app.Run();

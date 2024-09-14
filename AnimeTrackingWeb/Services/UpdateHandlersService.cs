@@ -71,6 +71,11 @@ public class UpdateHandlersService
     {
         try
         {
+            if (message.WebAppData?.Data is string idText)
+            {
+                var ids = idText.Split(",");
+            }
+            
             if (message.Text is not { } messageText)
                 return;
             var words = messageText.Split(' ');
@@ -130,7 +135,7 @@ public class UpdateHandlersService
                 {
                     WebApp = new WebAppInfo()
                     {
-                        Url = $"https://192.168.0.103:5173",
+                        Url = $"https://192.168.0.104:5173",
                     }
                 };
                 var inlineMarkup = new ReplyKeyboardMarkup(keyBoardButton);
@@ -162,15 +167,5 @@ public class UpdateHandlersService
         }
 
         return webAppDtos;
-    }
-
-    private static ValueTask BotClientOnOnMakingApiRequest(ITelegramBotClient botclient, ApiRequestEventArgs args, CancellationToken cancellationtoken)
-    {
-        return ValueTask.CompletedTask;
-    }
-
-    private static ValueTask BotClientOnOnApiResponseReceived(ITelegramBotClient botclient, ApiResponseEventArgs args, CancellationToken cancellationtoken)
-    {
-        return ValueTask.CompletedTask;
     }
 }
