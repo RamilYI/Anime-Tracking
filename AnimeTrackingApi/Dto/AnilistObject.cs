@@ -1,4 +1,4 @@
-﻿namespace AnimeTrackingApi;
+﻿namespace AnimeTrackingApi.Dto;
 
 internal class AnilistObject
 {

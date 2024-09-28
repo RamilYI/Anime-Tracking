@@ -6,20 +6,24 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace AnimeTrackingApi;
 
+/// <inheritdoc />
 public class AnimeTracking : IAnimeTracking
 {
+    #region IAnimeTracking
+
+    /// <inheritdoc />
     public async Task<ScheduleDto?> GetTitleSchedule(string title)
     {
         var season = await this.GetSeason();
-        var findTitle = season.media.FirstOrDefault(x => x.title.IsDesiredTitle(title));
-        if (findTitle != null)
+        var findTitle = season.media.FirstOrDefault(x => x.title != null && x.title.IsDesiredTitle(title));
+        if (findTitle is {id: not null})
         {
             var schedule = await this.GetSchedule(findTitle.id.Value);
             return schedule;
         }
 
-        findTitle = season.media.FirstOrDefault(x => x.title.SearchTitleWithSimilarName(title));
-        if (findTitle != null)
+        findTitle = season.media.FirstOrDefault(x => x.title != null && x.title.SearchTitleWithSimilarName(title));
+        if (findTitle is {id: not null})
         {
             var schedule = await this.GetSchedule(findTitle.id.Value);
             return schedule;
@@ -27,7 +31,8 @@ public class AnimeTracking : IAnimeTracking
 
         return null;
     }
-
+    
+    /// <inheritdoc />
     public async Task<ScheduleDto?> GetSchedule(int findTitleId)
     {
         var client = new HttpClient();
@@ -39,22 +44,23 @@ public class AnimeTracking : IAnimeTracking
         try
         {
             var response = await client.PostAsync(AnilistScripts.Url, content);
-            if (response != null)
+            var jsonResult = await response.Content.ReadAsStringAsync();
+            var formattedResult = JObject.Parse(jsonResult)["data"]?["Media"]?.ToString();
+            if (formattedResult != null)
             {
-                var jsonResult = await response.Content.ReadAsStringAsync();
-                var formattedResult = JObject.Parse(jsonResult)["data"]?["Media"]?.ToString();
                 var scheduleDto = JsonSerializer.Deserialize<ScheduleDto>(formattedResult);
                 return scheduleDto;
             }
         }
         catch (Exception ex)
         {
-            
+            // ignored
         }
 
         return new ScheduleDto();
     }
 
+    /// <inheritdoc />
     public async Task<SeasonDto> GetSeason()
     {
         var client = new HttpClient();
@@ -71,21 +77,26 @@ public class AnimeTracking : IAnimeTracking
             try
             {
                 var response = await client.PostAsync(AnilistScripts.Url, content);
-                if (response != null)
+                var jsonResult = await response.Content.ReadAsStringAsync();
+                hasPage = Convert.ToBoolean(JObject.Parse(jsonResult)["data"]?["Page"]?["pageInfo"]?["hasNextPage"]?.ToString());
+                var formattedResult = JObject.Parse(jsonResult)["data"]?["Page"]?.ToString();
+                if (formattedResult != null)
                 {
-                    var jsonResult = await response.Content.ReadAsStringAsync();
-                    hasPage = Convert.ToBoolean(JObject.Parse(jsonResult)["data"]?["Page"]?["pageInfo"]?["hasNextPage"].ToString());
-                    var formattedResult = JObject.Parse(jsonResult)["data"]?["Page"]?.ToString();
                     var seasonDto = JsonSerializer.Deserialize<SeasonDto>(formattedResult);
-                    season.media.AddRange(seasonDto.media);
+                    if (seasonDto?.media != null)
+                    {
+                        season.media.AddRange(seasonDto.media);
+                    }
                 }
             }
             catch (Exception ex)
             {
-            
+                // ignored
             }
         }
 
         return season;
     }
+
+    #endregion
 }

@@ -9,7 +9,7 @@ namespace AnimeTrackingWeb.Controllers;
 public class GetSeasonController : ControllerBase
 {
     [HttpGet]
-    public async Task<IEnumerable<TitleInformation>> Get([FromServices]AnimeTracking animeTracking)
+    public async Task<IEnumerable<TitleInformation>> Get([FromServices]IAnimeTracking animeTracking)
     {
         var season = await animeTracking.GetSeason();
         return season.media;

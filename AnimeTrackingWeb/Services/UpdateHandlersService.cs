@@ -1,190 +1,176 @@
-using System.Text;
-using System.Web;
 using AnimeTrackingApi;
-using AnimeTrackingApi.Dto;
-using AnimeTrackingWeb.Jobs;
 using Hangfire;
-using Quartz;
-using Quartz.Impl;
 using Telegram.Bot;
-using Telegram.Bot.Args;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 namespace AnimeTrackingWeb.Services;
-
-public class AnimeSeasonWebAppDto
-{
-    public int Id { get; set; }
-    
-    public string englishTitle { get; set; }
-    
-    public string nativeTitle { get; set; }
-    
-    public string romajiTitle { get; set; }
-    
-    public bool isEnabled { get; set; }
-}
 
 /// <summary>
 /// Сервис обновления запросов клиента.
 /// </summary>
 public class UpdateHandlersService
 {
-    private readonly ITelegramBotClient _botClient;
-    private readonly ILogger<UpdateHandlersService> _logger;
-    private readonly AnimeTracking _animeTracking = new(); // переиграем как у того шведа (автор DI)
+    #region Поля и свойства
+
+    /// <summary>
+    /// Клиент телеграм-бота.
+    /// </summary>
+    private readonly ITelegramBotClient botClient;
     
-    public UpdateHandlersService(ITelegramBotClient botClient, ILogger<UpdateHandlersService> logger)
-    {
-        _botClient = botClient;
-        _logger = logger;
-    }
-    
-    public async Task HandleUpdateAsync(Update update, ISchedulerFactory schedulerFactory,
-        CancellationToken cancellationToken)
+    /// <summary>
+    /// Логгер.
+    /// </summary>
+    private readonly ILogger<UpdateHandlersService> logger;
+
+    /// <summary>
+    /// Аниме-трекер.
+    /// </summary>
+    private IAnimeTracking animeTracking;
+
+    #endregion
+
+    #region Методы
+
+    /// <summary>
+    /// Обработать запрос клиента.
+    /// </summary>
+    /// <param name="update">Запрос.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    public async Task HandleUpdateAsync(Update update, CancellationToken cancellationToken)
     {
         var handler = update switch
         {
-            // UpdateType.Unknown:
-            // UpdateType.ChannelPost:
-            // UpdateType.EditedChannelPost:
-            // UpdateType.ShippingQuery:
-            // UpdateType.PreCheckoutQuery:
-            // UpdateType.Poll:
-            { Message: { } message }                       => BotOnMessageReceived(message,schedulerFactory, cancellationToken),
-            // { EditedMessage: { } message }                 => BotOnMessageReceived(message, cancellationToken),
-            // { CallbackQuery: { } callbackQuery }           => BotOnCallbackQueryReceived(callbackQuery, cancellationToken),
-            // { InlineQuery: { } inlineQuery }               => BotOnInlineQueryReceived(inlineQuery, cancellationToken),
-            // { ChosenInlineResult: { } chosenInlineResult } => BotOnChosenInlineResultReceived(chosenInlineResult, cancellationToken),
-            _                                              => UnknownUpdateHandlerAsync(update, cancellationToken)
+            { Message: { } message }                       => BotOnMessageReceived(message, cancellationToken),
+            _                                              => UnknownUpdateHandlerAsync(update)
         };
 
         await handler;
     }
 
-    private Task UnknownUpdateHandlerAsync(Update update, CancellationToken cancellationToken)
+    /// <summary>
+    /// Обработать неизвестный запрос.
+    /// </summary>
+    /// <param name="update">Запрос.</param>
+    /// <returns>Результат.</returns>
+    private Task UnknownUpdateHandlerAsync(Update update)
     {
-        throw new NotImplementedException();
+        this.logger.LogInformation("Неизвестный тип: {UpdateType}", update.Type);
+        return Task.CompletedTask;
     }
 
-    private async Task BotOnMessageReceived(Message message, ISchedulerFactory schedulerFactory,
-        CancellationToken cancellationToken)
+    /// <summary>
+    /// Обработать запрос сообщения.
+    /// </summary>
+    /// <param name="message">Сообщение.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    private async Task BotOnMessageReceived(Message message, CancellationToken cancellationToken)
     {
         try
         {
-            if (message.WebAppData?.Data is string idValues)
+            // при наличии данных в WebAppData это запрос на создание джобов
+            if (message.WebAppData?.Data is { } titleIdValues)
             {
-                var ids = idValues.Split(",").Select(x => x.ParseInt());
-                foreach (var id in ids)
-                {
-                    var schedule = await _animeTracking.GetSchedule(id);
-                    var episodeInformations = schedule?.airingSchedule.edges.Select(x => x.node);
-                    foreach (var episodeInformation in episodeInformations)
-                    {
-                        var date = episodeInformation.getAiringAtUtc();
-                        BackgroundJob.Schedule(() => SendTelegramNotifications(message.Chat.Id, schedule.title.english, episodeInformation.episode, cancellationToken), date);
-                    }
-                }
-            
-                message.WebAppData = null;
-            }
-            
-            if (message.Text is not { } messageText)
-                return;
-            var words = messageText.Split(' ');
-            if (words.ElementAtOrDefault(0) == null || words.ElementAtOrDefault(1) == null)
-                return;
-        
-            var action = words[0] switch
-            {
-                "/findongoing" => FindOngoing(_botClient, message, cancellationToken, schedulerFactory, string.Join(' ', words.Skip(1)), _animeTracking),
-                "/findongoing2" => CheckButtons(_botClient, message, _animeTracking),
-                "/checkButtons" => CheckButtons(_botClient, message, _animeTracking),
-            };
-
-            static async Task<Message> FindOngoing(ITelegramBotClient telegramBotClient, Message message,
-                CancellationToken cancellationToken, ISchedulerFactory factory, string titleName,
-                AnimeTracking _animetracking)
-            {
-                var result = _animetracking.GetTitleSchedule(titleName).Result;
-                if (result == null)
-                {
-                    return await telegramBotClient.SendTextMessageAsync(message.Chat.Id, text: $"doesnt find anything.", cancellationToken: cancellationToken);
-
-                }
-                var dates = result?.airingSchedule.edges.Select(x => x.node.getAiringAtUtc());
-            
-                var scheduler = await factory.GetScheduler();
-
-                foreach (var date in dates)
-                {
-                    await scheduler.Start();
-                    var job = JobBuilder.Create<OngoingJob>().Build();
-                    job.JobDataMap["TelegramBot"] = telegramBotClient;
-                    job.JobDataMap["TitleName"] = titleName;
-                    job.JobDataMap["MessageChatId"] = message.Chat.Id;
-                    job.JobDataMap["CancellationToken"] = cancellationToken;
-                    var trigger = TriggerBuilder.Create().StartAt(date).Build();
-                    await scheduler.ScheduleJob(job, trigger);
-                }
-            
-                // just testing quartz
-                /*var testJob = JobBuilder.Create<OngoingJob>().Build();
-            var testTrigger = TriggerBuilder.Create().StartNow().WithSimpleSchedule(x => x.WithIntervalInMinutes(1)
-                .RepeatForever()).Build();
-            testTrigger.JobDataMap["TelegramBot"] = telegramBotClient;
-            testTrigger.JobDataMap["TitleName"] = titleName;
-            testTrigger.JobDataMap["MessageChatId"] = message.Chat.Id;
-            testTrigger.JobDataMap["CancellationToken"] = cancellationToken;
-            await scheduler.ScheduleJob(testJob, testTrigger);*/
-            
-                return await telegramBotClient.SendTextMessageAsync(message.Chat.Id, text: $"Excellent! Now you're subscribed to notifications of new {titleName} episodes.", cancellationToken: cancellationToken);
-            }
-        
-            static async Task<Message> CheckButtons(ITelegramBotClient botClient, Message message,
-                AnimeTracking animeTracking)
-            {
-                var keyBoardButton = new KeyboardButton("text")
-                {
-                    WebApp = new WebAppInfo()
-                    {
-                        Url = $"https://192.168.0.103:5173/",
-                    }
-                };
-                var inlineMarkup = new ReplyKeyboardMarkup(keyBoardButton);
-                return await botClient.SendTextMessageAsync(message.Chat.Id, "check buttons", replyMarkup: inlineMarkup);
+                await this.CreateJobs(message, cancellationToken, titleIdValues);
             }
 
-            var sentMessage = await action;
-            _logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
+            var sentMessage = await (message.Text?.Split(' ')[0] switch
+            {
+                "/start" => this.CreateMiniApp(message),
+                _ => this.Usage(message),
+            });
+            
+            this.logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
         }
     }
-
-    public void SendTelegramNotifications(long chatId, string? titleEnglish, int episodeNum,
-        CancellationToken cancellationToken)
+    
+    /// <summary>
+    /// Создать миниприложение.
+    /// </summary>
+    /// <param name="message">Сообщение.</param>
+    /// <returns>Созданное сообщение с миниприложением.</returns>
+    private async Task<Message> CreateMiniApp(Message message)
     {
-        _botClient.SendTextMessageAsync(chatId, text: $"Hey! New, {episodeNum} of {titleEnglish} is out! Check this out", cancellationToken: cancellationToken);
-    }
-
-    private static IList<AnimeSeasonWebAppDto> ConvertSeasonToWebAppDtos(SeasonDto season)
-    {
-        var webAppDtos = new List<AnimeSeasonWebAppDto>();
-
-        foreach (var titleInformation in season.media)
+        var keyBoardButton = new KeyboardButton("Выбрать тайтлы")
         {
-            webAppDtos.Add(new AnimeSeasonWebAppDto()
+            WebApp = new WebAppInfo()
             {
-                englishTitle = titleInformation.title.english,
-                nativeTitle = titleInformation.title.native,
-                romajiTitle = titleInformation.title.romaji,
-                Id = titleInformation.id.HasValue ? titleInformation.id.Value : 0,
-            });
-        }
-
-        return webAppDtos;
+                Url = $"https://192.168.0.103:5173/",
+            }
+        };
+        var inlineMarkup = new ReplyKeyboardMarkup(keyBoardButton);
+        return await this.botClient.SendTextMessageAsync(message.Chat.Id, @"Для выбора отслеживаемых тайтлов нажмите на кнопку «Выбрать тайтлы»", replyMarkup: inlineMarkup);
     }
+
+    /// <summary>
+    /// Создать джобы.
+    /// </summary>
+    /// <param name="message">Сообщение.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <param name="titleIdValues">Идентификаторы выбранных тайтлов.</param>
+    private async Task CreateJobs(Message message, CancellationToken cancellationToken, string titleIdValues)
+    {
+        var titleIds = titleIdValues.Split(",").Select(x => x.ParseInt());
+        foreach (var id in titleIds)
+        {
+            var schedule = await this.animeTracking.GetSchedule(id);
+            if (schedule?.airingSchedule?.edges == null)
+            {
+                continue;
+            }
+            
+            foreach (var episodeInformation in schedule.airingSchedule.edges.Select(x => x.node))
+            {
+                var date = episodeInformation.getAiringAtUtc();
+                var title = schedule.title.english ?? schedule.title.romaji ?? schedule.title.native;
+                BackgroundJob.Schedule(
+                    () => SendNotifications(message.Chat.Id, title,
+                        episodeInformation.episode, cancellationToken), date);
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Отправить уведомление.
+    /// </summary>
+    /// <param name="chatId">Идентификатор чата клиента.</param>
+    /// <param name="title">Название тайтла.</param>
+    /// <param name="episodeNum">Номер вышедшего эпизода.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    public void SendNotifications(long chatId, string? title, int episodeNum, CancellationToken cancellationToken)
+    {
+        botClient.SendTextMessageAsync(chatId, text: $"{episodeNum} эпизод {title} вышел!", cancellationToken: cancellationToken);
+    }
+
+    /// <summary>
+    /// Обработать некорректное сообщение.
+    /// </summary>
+    /// <param name="message">Сообщение.</param>
+    /// <returns>Созданное сообщение.</returns>
+    private async Task<Message> Usage(Message message)
+    {
+        var usage = "<b><u>Меню бота</u></b>:\n" +
+                    "/start             -   запустить бота";
+        return await this.botClient.SendTextMessageAsync(message.Chat, usage, parseMode: ParseMode.Html, replyMarkup: new ReplyKeyboardRemove());
+    }
+
+    #endregion
+
+    #region Конструктор
+
+    /// <summary>
+    /// Сервис обновления запросов клиента.
+    /// </summary>
+    public UpdateHandlersService(ITelegramBotClient botClient, ILogger<UpdateHandlersService> logger, IAnimeTracking animeTracking)
+    {
+        this.botClient = botClient;
+        this.logger = logger;
+        this.animeTracking = animeTracking;
+    }
+
+    #endregion
 }

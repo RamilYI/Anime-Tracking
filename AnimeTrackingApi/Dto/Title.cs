@@ -7,12 +7,23 @@ public class CoverImage
 
 public class Title
 {
-    // TODO усовершенствовать для поиска 
+    // TODO усовершенствовать для поиска
+    
+    /// <summary>
+    /// Найти тайтл по имени.
+    /// </summary>
+    /// <param name="titleName">Имя тайтла.</param>
+    /// <returns>Признак наличия тайтла.</returns>
     public bool IsDesiredTitle(string titleName)
     {
         return this.CheckTitleByName(s => s.Equals(titleName));
     }
 
+    /// <summary>
+    /// Найти тайтл с одинаковым именем.
+    /// </summary>
+    /// <param name="titleName">Имя тайтла.</param>
+    /// <returns>Признак наличия тайтла.</returns>
     public bool SearchTitleWithSimilarName(string titleName)
     {
         return this.CheckTitleByName(s => s.Contains(titleName, StringComparison.CurrentCulture)) ||
@@ -23,6 +34,11 @@ public class Title
                this.CheckTitleByName(s => s.Contains(titleName, StringComparison.OrdinalIgnoreCase));
     }
 
+    /// <summary>
+    /// Проверка тайтла по имени.
+    /// </summary>
+    /// <param name="pred">Предикат проверки.</param>
+    /// <returns>Результат проверки.</returns>
     public bool CheckTitleByName(Predicate<string> pred)
     {
         return pred(english ?? string.Empty) || pred(romaji ?? string.Empty) || pred(native ?? string.Empty);

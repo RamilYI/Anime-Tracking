@@ -11,11 +11,6 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register named HttpClient to get benefits of IHttpClientFactory
-// and consume it with ITelegramBotClient typed client.
-// More read:
-//  https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests#typed-clients
-//  https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests
 builder.Services.AddHttpClient("telegram_bot_client")
     .AddTypedClient<ITelegramBotClient>((httpClient, sp) =>
     {
@@ -25,7 +20,7 @@ builder.Services.AddHttpClient("telegram_bot_client")
 
 // Dummy business-logic service
 builder.Services.AddScoped<UpdateHandlersService>();
-builder.Services.AddScoped<AnimeTracking>();
+builder.Services.AddScoped<IAnimeTracking, AnimeTracking>();
 // Add the required Quartz.NET services
 builder.Services.AddQuartz(q =>  
 {
