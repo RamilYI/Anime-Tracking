@@ -3,6 +3,7 @@ using System.Web;
 using AnimeTrackingApi;
 using AnimeTrackingApi.Dto;
 using AnimeTrackingWeb.Jobs;
+using Hangfire;
 using Quartz;
 using Quartz.Impl;
 using Telegram.Bot;
@@ -71,9 +72,21 @@ public class UpdateHandlersService
     {
         try
         {
-            if (message.WebAppData?.Data is string idText)
+            if (message.WebAppData?.Data is string idValues)
             {
-                var ids = idText.Split(",");
+                var ids = idValues.Split(",").Select(x => x.ParseInt());
+                foreach (var id in ids)
+                {
+                    var schedule = await _animeTracking.GetSchedule(id);
+                    var episodeInformations = schedule?.airingSchedule.edges.Select(x => x.node);
+                    foreach (var episodeInformation in episodeInformations)
+                    {
+                        var date = episodeInformation.getAiringAtUtc();
+                        BackgroundJob.Schedule(() => SendTelegramNotifications(message.Chat.Id, schedule.title.english, episodeInformation.episode, cancellationToken), date);
+                    }
+                }
+            
+                message.WebAppData = null;
             }
             
             if (message.Text is not { } messageText)
@@ -135,7 +148,7 @@ public class UpdateHandlersService
                 {
                     WebApp = new WebAppInfo()
                     {
-                        Url = $"https://192.168.0.104:5173",
+                        Url = $"https://192.168.0.103:5173/",
                     }
                 };
                 var inlineMarkup = new ReplyKeyboardMarkup(keyBoardButton);
@@ -149,6 +162,12 @@ public class UpdateHandlersService
         {
             Console.WriteLine(e);
         }
+    }
+
+    public void SendTelegramNotifications(long chatId, string? titleEnglish, int episodeNum,
+        CancellationToken cancellationToken)
+    {
+        _botClient.SendTextMessageAsync(chatId, text: $"Hey! New, {episodeNum} of {titleEnglish} is out! Check this out", cancellationToken: cancellationToken);
     }
 
     private static IList<AnimeSeasonWebAppDto> ConvertSeasonToWebAppDtos(SeasonDto season)

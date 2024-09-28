@@ -23,6 +23,23 @@ public static class Extensions
     {
         app.ApplicationServices.GetService<IScheduler>();
     }
+    
+    /// <summary>
+    /// Парсинг целого числа.
+    /// </summary>
+    /// <param name="text">Текстовое значение.</param>
+    /// <param name="defaultValue">Значение по умолчанию [предустановленно].</param>
+    /// <returns>Значение типа Int.</returns>
+    public static int ParseInt(this string text, int defaultValue = 0)
+    {
+        int v;
+        if (int.TryParse(text, out v))
+        {
+            return v;
+        }
+
+        return defaultValue;
+    }
 
     public static async void AddQuartz(this IServiceCollection services)
     {

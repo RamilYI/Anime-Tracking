@@ -2,6 +2,7 @@ using AnimeTrackingApi;
 using AnimeTrackingWeb;
 using AnimeTrackingWeb.Controllers;
 using AnimeTrackingWeb.Services;
+using Hangfire;
 using Microsoft.AspNetCore.Cors;
 using Quartz;
 using Telegram.Bot;
@@ -48,17 +49,26 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddHangfire(configuration => configuration
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings());
+Hangfire.GlobalConfiguration.Configuration
+    .UseSqlServerStorage("Data Source=(localdb)\\mssqllocaldb;Initial Catalog=AnimeTracking;Integrated Security=True;Multiple Active Result Sets=True");
+builder.Services.AddHangfireServer();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AnimeTrackingDemo.AnimeTrackingWeb v1"));
 }
+
+app.UseRouting();
 app.UseHttpsRedirection();
 app.UseAuthorization();
+app.UseHangfireDashboard();
 app.MapBotWebhookRoute<BotController>(route: "/api/bot");
 app.MapBotWebhookRoute<GetSeasonController>(route: "/api/bot/getSeason");
 app.MapControllers();

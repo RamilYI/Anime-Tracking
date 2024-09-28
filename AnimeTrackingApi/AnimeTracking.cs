@@ -28,7 +28,7 @@ public class AnimeTracking : IAnimeTracking
         return null;
     }
 
-    private async Task<ScheduleDto?> GetSchedule(int findTitleId)
+    public async Task<ScheduleDto?> GetSchedule(int findTitleId)
     {
         var client = new HttpClient();
         var content = new StringContent(JsonConvert.SerializeObject(new AnilistObject

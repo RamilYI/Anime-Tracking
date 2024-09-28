@@ -11,7 +11,8 @@ class Program
     static async Task Main(string[] args)
     {
         var animeTracking = new AnimeTracking();
-        var result = animeTracking.GetTitleSchedule("Titan").Result;
+        var season = await animeTracking.GetSeason();
+        var result = await animeTracking.GetSchedule(season.media[45].id.Value);
         var dates = result?.airingSchedule.edges.Select(x => x.node.getAiringAtUtc());
         
         foreach (var date in dates)
