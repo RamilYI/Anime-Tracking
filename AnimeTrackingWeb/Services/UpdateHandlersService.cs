@@ -1,4 +1,5 @@
 using AnimeTrackingApi;
+using AnimeTrackingWeb.Interfaces;
 using Hangfire;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -27,6 +28,11 @@ public class UpdateHandlersService
     /// Аниме-трекер.
     /// </summary>
     private IAnimeTracking animeTracking;
+
+    /// <summary>
+    /// Сервис управления пользователями.
+    /// </summary>
+    public IUserService userService { get; set; }
 
     #endregion
 
@@ -95,11 +101,19 @@ public class UpdateHandlersService
     /// <returns>Созданное сообщение с миниприложением.</returns>
     private async Task<Message> CreateMiniApp(Message message)
     {
+        var urlParams = string.Empty;
+        var titleIds = this.userService.GetUserTitleIds(message.Chat.Id);
+
+        if (titleIds.Any())
+        {
+            urlParams = "?_titles=" + string.Join(";", titleIds);
+        }
+        
         var keyBoardButton = new KeyboardButton("Выбрать тайтлы")
         {
             WebApp = new WebAppInfo()
             {
-                Url = $"https://192.168.0.103:5173/",
+                Url = $"https://192.168.0.103:5173/" + urlParams,
             }
         };
         var inlineMarkup = new ReplyKeyboardMarkup(keyBoardButton);
@@ -114,9 +128,14 @@ public class UpdateHandlersService
     /// <param name="titleIdValues">Идентификаторы выбранных тайтлов.</param>
     private async Task CreateJobs(Message message, CancellationToken cancellationToken, string titleIdValues)
     {
-        var titleIds = titleIdValues.Split(",").Select(x => x.ParseInt());
+        var titleIds = titleIdValues.Split(",").Select(x => x.ParseInt()).ToList();
         foreach (var id in titleIds)
         {
+            if (this.userService.CheckUserTitleId(message.Chat.Id, id))
+            {
+                continue;
+            }
+            
             var schedule = await this.animeTracking.GetSchedule(id);
             if (schedule?.airingSchedule?.edges == null)
             {
@@ -128,10 +147,12 @@ public class UpdateHandlersService
                 var date = episodeInformation.getAiringAtUtc();
                 var title = schedule.title.english ?? schedule.title.romaji ?? schedule.title.native;
                 BackgroundJob.Schedule(
-                    () => SendNotifications(message.Chat.Id, title,
+                    () => this.SendNotifications(message.Chat.Id, title,
                         episodeInformation.episode, cancellationToken), date);
             }
         }
+        
+        this.userService.AddUserTitleIds(message.Chat.Id, titleIds);
     }
     
     /// <summary>
@@ -165,12 +186,13 @@ public class UpdateHandlersService
     /// <summary>
     /// Сервис обновления запросов клиента.
     /// </summary>
-    public UpdateHandlersService(ITelegramBotClient botClient, ILogger<UpdateHandlersService> logger, IAnimeTracking animeTracking)
+    public UpdateHandlersService(ITelegramBotClient botClient, ILogger<UpdateHandlersService> logger, IAnimeTracking animeTracking, IUserService userService)
     {
         this.botClient = botClient;
         this.logger = logger;
         this.animeTracking = animeTracking;
+        this.userService = userService;
     }
-
+    
     #endregion
 }

@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "serviceConnectorResourceId": "",
+      "secretStore": "LocalSecretsFile",
+      "resourceId": null,
+      "type": "mssql.local",
+      "connectionId": "ConnectionStrings:Server=(localdb):mssqllocaldb;Database=AnimeTracking;Trusted_Connection=True;MultipleActiveResultSets=true"
+    },
+    "secrets1": {
+      "secretStore": null,
+      "resourceId": null,
+      "type": "secrets.user",
+      "connectionId": null
+    }
+  }
+}

@@ -1,5 +1,7 @@
 using AnimeTrackingApi;
 using AnimeTrackingApi.Dto;
+using AnimeTrackingWeb.Interfaces;
+using AnimeTrackingWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AnimeTrackingWeb.Controllers;

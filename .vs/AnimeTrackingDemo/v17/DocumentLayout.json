@@ -1,0 +1,132 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "F:\\some projects\\AnimeTrackingDemo\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/HangfireTest/True/SqlTable/HangFire.Hash.sql||{0058A1F7-65F3-4DB9-B3D0-CA7E64DD73CD}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/HangfireTest/True/SqlTable/HangFire.Counter.sql||{0058A1F7-65F3-4DB9-B3D0-CA7E64DD73CD}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/HangfireTest/True/SqlTable/HangFire.AggregatedCounter.sql||{0058A1F7-65F3-4DB9-B3D0-CA7E64DD73CD}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/AnimeTracking/True/SqlTable/HangFire.AggregatedCounter.sql||{0058A1F7-65F3-4DB9-B3D0-CA7E64DD73CD}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C958E5C-97D0-4F89-ABD7-15EBDB0DBE4D}|AnimeTrackingWeb\\AnimeTrackingWeb.csproj|f:\\some projects\\animetrackingdemo\\animetrackingweb\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5C958E5C-97D0-4F89-ABD7-15EBDB0DBE4D}|AnimeTrackingWeb\\AnimeTrackingWeb.csproj|solutionrelative:animetrackingweb\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ramil\\AppData\\Roaming\\Microsoft\\UserSecrets\\c0b270af-797e-4711-86cf-43b32e437a1c\\secrets.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5C958E5C-97D0-4F89-ABD7-15EBDB0DBE4D}|AnimeTrackingWeb\\AnimeTrackingWeb.csproj|f:\\some projects\\animetrackingdemo\\animetrackingweb\\animetrackingweb.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{5C958E5C-97D0-4F89-ABD7-15EBDB0DBE4D}|AnimeTrackingWeb\\AnimeTrackingWeb.csproj|solutionrelative:animetrackingweb\\animetrackingweb.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 313,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 542,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "HangFire.Hash [Data]",
+              "DocumentMoniker": "ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/HangfireTest/True/SqlTable/HangFire.Hash.sql",
+              "ToolTip": "HangFire.Hash [Data]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2024-09-24T19:28:38.916Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "HangFire.Counter [Data]",
+              "DocumentMoniker": "ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/HangfireTest/True/SqlTable/HangFire.Counter.sql",
+              "ToolTip": "HangFire.Counter [Data]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2024-09-24T19:28:30.779Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "HangFire.AggregatedCounter [Data]",
+              "DocumentMoniker": "ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/HangfireTest/True/SqlTable/HangFire.AggregatedCounter.sql",
+              "ToolTip": "HangFire.AggregatedCounter [Data]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2024-09-24T19:28:20.869Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "HangFire.AggregatedCounter [Data]",
+              "DocumentMoniker": "ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/AnimeTracking/True/SqlTable/HangFire.AggregatedCounter.sql",
+              "ToolTip": "HangFire.AggregatedCounter [Data]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2024-09-24T19:28:07.881Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Program.cs",
+              "DocumentMoniker": "F:\\some projects\\AnimeTrackingDemo\\AnimeTrackingWeb\\Program.cs",
+              "RelativeDocumentMoniker": "AnimeTrackingWeb\\Program.cs",
+              "ToolTip": "F:\\some projects\\AnimeTrackingDemo\\AnimeTrackingWeb\\Program.cs",
+              "RelativeToolTip": "AnimeTrackingWeb\\Program.cs",
+              "ViewState": "AQIAACsAAAAAAAAAAAAAAD4AAAAkAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-24T19:12:10.32Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "secrets.json",
+              "DocumentMoniker": "C:\\Users\\ramil\\AppData\\Roaming\\Microsoft\\UserSecrets\\c0b270af-797e-4711-86cf-43b32e437a1c\\secrets.json",
+              "ToolTip": "C:\\Users\\ramil\\AppData\\Roaming\\Microsoft\\UserSecrets\\c0b270af-797e-4711-86cf-43b32e437a1c\\secrets.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAIAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-09-24T19:14:51.179Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AnimeTrackingWeb",
+              "DocumentMoniker": "F:\\some projects\\AnimeTrackingDemo\\AnimeTrackingWeb\\AnimeTrackingWeb.csproj",
+              "RelativeDocumentMoniker": "AnimeTrackingWeb\\AnimeTrackingWeb.csproj",
+              "ToolTip": "F:\\some projects\\AnimeTrackingDemo\\AnimeTrackingWeb\\AnimeTrackingWeb.csproj",
+              "RelativeToolTip": "AnimeTrackingWeb\\AnimeTrackingWeb.csproj",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2024-09-24T19:07:00.558Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

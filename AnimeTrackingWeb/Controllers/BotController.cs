@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using AnimeTrackingWeb.Interfaces;
 using AnimeTrackingWeb.Services;
 using Microsoft.AspNetCore.Cors;
 using Telegram.Bot;

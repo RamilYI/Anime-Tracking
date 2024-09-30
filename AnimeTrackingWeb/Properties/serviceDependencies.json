@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "type": "mssql",
+      "connectionId": "ConnectionStrings:Server=(localdb):mssqllocaldb;Database=AnimeTracking;Trusted_Connection=True;MultipleActiveResultSets=true"
+    },
+    "secrets1": {
+      "type": "secrets",
+      "connectionId": null
+    }
+  }
+}

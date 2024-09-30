@@ -1,9 +1,12 @@
 using AnimeTrackingApi;
 using AnimeTrackingWeb;
 using AnimeTrackingWeb.Controllers;
+using AnimeTrackingWeb.Interfaces;
+using AnimeTrackingWeb.Models;
 using AnimeTrackingWeb.Services;
 using Hangfire;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -50,7 +53,21 @@ builder.Services.AddHangfire(configuration => configuration
 Hangfire.GlobalConfiguration.Configuration
     .UseSqlServerStorage("Data Source=(localdb)\\mssqllocaldb;Initial Catalog=AnimeTracking;Integrated Security=True;Multiple Active Result Sets=True");
 builder.Services.AddHangfireServer();
+
+builder.Services.AddDbContext<UserContext>(options => options
+    .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=AnimeTrackingUsers;Trusted_Connection=True;ConnectRetryCount=0"));
+builder.Services.AddTransient<IUserService, UserService>();
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<UserContext>();
+    context.Database.EnsureCreated();
+}
+
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
