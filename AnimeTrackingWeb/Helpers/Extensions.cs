@@ -1,9 +1,14 @@
-using Quartz;
-
 namespace AnimeTrackingWeb;
 
 public static class Extensions
 {
+    /// <summary>
+    /// Замапить контроллер.
+    /// </summary>
+    /// <param name="endpoints">Строитель эндпоинтов.</param>
+    /// <param name="route">Путь к ресурсу.</param>
+    /// <typeparam name="T">Тип контроллера.</typeparam>
+    /// <returns>Строитель эндпоинтов.</returns>
     public static ControllerActionEndpointConventionBuilder MapBotWebhookRoute<T>(
         this IEndpointRouteBuilder endpoints,
         string route)
@@ -16,12 +21,7 @@ public static class Extensions
             pattern: route,
             defaults: new { controller = controllerName, action = actionName });
     }
-    
-    public static void UseQuartz(this IApplicationBuilder app)
-    {
-        app.ApplicationServices.GetService<IScheduler>();
-    }
-    
+
     /// <summary>
     /// Парсинг целого числа.
     /// </summary>

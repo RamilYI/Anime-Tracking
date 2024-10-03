@@ -11,11 +11,14 @@ public class ConfigureWebhook : IHostedService
 {
     private readonly ILogger<ConfigureWebhook> _logger;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IOptions<BotConfiguration> configs;
 
     public ConfigureWebhook(
         ILogger<ConfigureWebhook> logger,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        IOptions<BotConfiguration> configs)
     {
+        this.configs = configs;
         _logger = logger;
         _serviceProvider = serviceProvider;
     }
@@ -24,17 +27,9 @@ public class ConfigureWebhook : IHostedService
     {
         using var scope = _serviceProvider.CreateScope();
         var botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
-
-        // Configure custom endpoint per Telegram API recommendations:
-        // https://core.telegram.org/bots/api#setwebhook
-        // If you'd like to make sure that the webhook was set by you, you can specify secret data
-        // in the parameter secret_token. If specified, the request will contain a header
-        // "X-Telegram-Bot-Api-Secret-Token" with the secret token as content.\
-        // "https://api.telegram.org/bot5845820795:AAG5Odw1IRlkrnDZNnbcOuLjlFOm3f7RGv0/setwebhook?url=https://c1bc-136-169-224-119.eu.ngrok.io/api/bot"
-        var webhookAddress = "https://user86705793-5vyjlop5.wormhole.vk-apps.com/";
-        _logger.LogInformation("Setting webhook: {WebhookAddress}", webhookAddress);
+        _logger.LogInformation("Setting webhook: {WebhookAddress}", this.configs.Value.BotWebAppUrl);
         await botClient.SetWebhookAsync(
-            url: webhookAddress,
+            url: $"{this.configs.Value.BotWebAppUrl.ToString()}/api/bot",
             allowedUpdates: Array.Empty<UpdateType>(),
             cancellationToken: cancellationToken);
     }

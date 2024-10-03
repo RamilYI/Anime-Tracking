@@ -1,6 +1,7 @@
 using AnimeTrackingApi;
 using AnimeTrackingWeb.Interfaces;
 using Hangfire;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -32,7 +33,12 @@ public class UpdateHandlersService
     /// <summary>
     /// Сервис управления пользователями.
     /// </summary>
-    public IUserService userService { get; set; }
+    private IUserService userService;
+
+    /// <summary>
+    /// Конфигурация.
+    /// </summary>
+    private readonly IOptions<BotConfiguration> configuration;
 
     #endregion
 
@@ -113,7 +119,7 @@ public class UpdateHandlersService
         {
             WebApp = new WebAppInfo()
             {
-                Url = $"https://192.168.0.103:5173/" + urlParams,
+                Url = this.configuration.Value.MiniAppUrl + urlParams,
             }
         };
         var inlineMarkup = new ReplyKeyboardMarkup(keyBoardButton);
@@ -175,7 +181,7 @@ public class UpdateHandlersService
     private async Task<Message> Usage(Message message)
     {
         var usage = "<b><u>Меню бота</u></b>:\n" +
-                    "/start             -   запустить бота";
+                    "/start             -           запустить бота";
         return await this.botClient.SendTextMessageAsync(message.Chat, usage, parseMode: ParseMode.Html, replyMarkup: new ReplyKeyboardRemove());
     }
 
@@ -186,12 +192,17 @@ public class UpdateHandlersService
     /// <summary>
     /// Сервис обновления запросов клиента.
     /// </summary>
-    public UpdateHandlersService(ITelegramBotClient botClient, ILogger<UpdateHandlersService> logger, IAnimeTracking animeTracking, IUserService userService)
+    public UpdateHandlersService(ITelegramBotClient botClient,
+        ILogger<UpdateHandlersService> logger,
+        IAnimeTracking animeTracking,
+        IUserService userService,
+        IOptions<BotConfiguration> configuration)
     {
         this.botClient = botClient;
         this.logger = logger;
         this.animeTracking = animeTracking;
         this.userService = userService;
+        this.configuration = configuration;
     }
     
     #endregion
