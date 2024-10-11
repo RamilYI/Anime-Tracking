@@ -93,7 +93,7 @@ internal static class AnilistScripts
     /// </summary>
     /// <param name="currentDate">Дата.</param>
     /// <returns>Сезон.</returns>
-    private static AnimeSeason GetSeason(DateTime currentDate)
+    public static AnimeSeason GetSeason(DateTime currentDate)
     {
         if (currentDate.Month is 1 or < 3)
         {

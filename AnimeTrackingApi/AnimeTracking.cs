@@ -11,6 +11,12 @@ public class AnimeTracking : IAnimeTracking
 {
     #region IAnimeTracking
 
+    /// <summary>
+    /// Текущий сезон.
+    /// </summary>
+    private (AnimeSeason season, string date) currentSeason;
+    private SeasonDto season;
+
     /// <inheritdoc />
     public async Task<ScheduleDto?> GetTitleSchedule(string title)
     {
@@ -45,7 +51,7 @@ public class AnimeTracking : IAnimeTracking
         {
             var response = await client.PostAsync(AnilistScripts.Url, content);
             var jsonResult = await response.Content.ReadAsStringAsync();
-            var formattedResult = JObject.Parse(jsonResult)["data"]?["Media"]?.ToString();
+            var formattedResult = JObject.Parse(jsonResult)?["data"]?["Media"]?.ToString();
             if (formattedResult != null)
             {
                 var scheduleDto = JsonSerializer.Deserialize<ScheduleDto>(formattedResult);
@@ -63,8 +69,19 @@ public class AnimeTracking : IAnimeTracking
     /// <inheritdoc />
     public async Task<SeasonDto> GetSeason()
     {
+        // возможно будет
+        var newCurrentSeason = this.GetCurrentSeason(DateTime.Now);
+        if (newCurrentSeason == this.currentSeason && this.season != null)
+        {
+            return this.season;
+        }
+        else
+        {
+            this.currentSeason = newCurrentSeason;
+        }
+
         var client = new HttpClient();
-        var season = new SeasonDto();
+        this.season = new SeasonDto();
         var hasPage = true;
         var pageNum = 1;
         while (hasPage)
@@ -78,14 +95,20 @@ public class AnimeTracking : IAnimeTracking
             {
                 var response = await client.PostAsync(AnilistScripts.Url, content);
                 var jsonResult = await response.Content.ReadAsStringAsync();
-                hasPage = Convert.ToBoolean(JObject.Parse(jsonResult)["data"]?["Page"]?["pageInfo"]?["hasNextPage"]?.ToString());
+                var hasPageStr = JObject.Parse(jsonResult)["data"]?["Page"]?["pageInfo"]?["hasNextPage"]?.ToString();
+                if (string.IsNullOrEmpty(hasPageStr))
+                {
+                    continue;
+                }
+
+                hasPage = Convert.ToBoolean(hasPageStr);
                 var formattedResult = JObject.Parse(jsonResult)["data"]?["Page"]?.ToString();
                 if (formattedResult != null)
                 {
                     var seasonDto = JsonSerializer.Deserialize<SeasonDto>(formattedResult);
                     if (seasonDto?.media != null)
                     {
-                        season.media.AddRange(seasonDto.media);
+                        this.season.media.AddRange(seasonDto.media);
                     }
                 }
             }
@@ -95,7 +118,30 @@ public class AnimeTracking : IAnimeTracking
             }
         }
 
-        return season;
+        return this.season;
+    }
+
+    /// <summary>
+    /// Получить текущий сезон.
+    /// </summary>
+    /// <param name="currentDate">Текущая дата.</param>
+    /// <returns>Текущий сезон.</returns>
+    private (AnimeSeason season, string date) GetCurrentSeason(DateTime currentDate)
+    {
+        var currentDateText = currentDate.ToString("MMMM dd, yyyy");
+        return (AnilistScripts.GetSeason(currentDate), currentDateText);
+    }
+
+    #endregion
+
+    #region Конструктор
+
+    /// <summary>
+    /// Аниме-трекер.
+    /// </summary>
+    public AnimeTracking()
+    {
+        this.currentSeason = this.GetCurrentSeason(DateTime.Now);
     }
 
     #endregion

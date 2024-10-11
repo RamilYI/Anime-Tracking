@@ -70,6 +70,7 @@ public class UserService : IUserService
                 };
             
                 context.Users.Add(user);
+                user.TitleIds = new List<int>();
             }
 
             user.TitleIds.Clear();

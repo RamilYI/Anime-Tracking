@@ -5,6 +5,7 @@ using AnimeTrackingWeb.Interfaces;
 using AnimeTrackingWeb.Models;
 using AnimeTrackingWeb.Services;
 using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 
@@ -19,24 +20,24 @@ builder.Services.AddHttpClient("telegram_bot_client")
     });
 
 builder.Services.AddScoped<UpdateHandlersService>();
-builder.Services.AddScoped<IAnimeTracking, AnimeTracking>();
+builder.Services.AddSingleton<IAnimeTracking, AnimeTracking>();
 builder.Services.AddHostedService<ConfigureWebhook>();
 
 // Add services to the container.
-
+builder.Services.AddCors();
 builder.Services.AddControllers().AddNewtonsoftJson();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHangfire(configuration => configuration
                 .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings());
-Hangfire.GlobalConfiguration.Configuration
-    .UseSqlServerStorage(botConfigSection.Get<BotConfiguration>()!.HangfireConnection);
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(config =>
+                    config.UseNpgsqlConnection(botConfigSection.Get<BotConfiguration>()!.HangfireConnection)));
 builder.Services.AddHangfireServer();
 
-builder.Services.AddDbContext<UserContext>(options => options
-    .UseSqlServer(botConfigSection.Get<BotConfiguration>()!.UserTableConnection));
+builder.Services.AddDbContextPool<UserContext>(options => options
+    .UseNpgsql(botConfigSection.Get<BotConfiguration>()!.UserTableConnection));
 builder.Services.AddTransient<IUserService, UserService>();
 
 var app = builder.Build();
@@ -56,6 +57,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+app.UseCors(builder => builder
+     .AllowAnyOrigin()
+     .AllowAnyMethod()
+     .AllowAnyHeader());
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseHangfireDashboard();
