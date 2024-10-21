@@ -27,5 +27,13 @@ public interface IUserService
     /// </summary>
     /// <param name="chatId">Идентификатор чата пользователя.</param>
     /// <param name="titleIds">Коллекция тайтлов.</param>
-    void AddUserTitleIds(long chatId, ICollection<int> titleIds);
+    /// <param name="jobIds">Коллекция идентификаторов джобов.</param>
+    void AddUserTitleIds(long chatId, ICollection<int> titleIds, IDictionary<int, ICollection<string>> jobIds);
+
+    /// <summary>
+    /// Получить удаляемые тайтлы пользователя.
+    /// </summary>
+    /// <param name="chatId">Идентификатор чата пользователя.</param>
+    /// <returns>Удаляемые джобы.</returns>
+    ICollection<string> GetDeletedUserTitles(long chatId);
 }

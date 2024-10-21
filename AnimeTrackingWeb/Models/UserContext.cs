@@ -16,6 +16,11 @@ public class UserContext : DbContext
     /// </summary>
     public DbSet<User> Users { get; set; }
     
+    /// <summary>
+    /// Таблица "Название тайтла, выбранного пользователем".
+    /// </summary>
+    public DbSet<Usertitle> Usertitles { get; set; }
+    
     public UserContext(DbContextOptions<UserContext> options, IOptions<BotConfiguration> configuration)
         : base(options)
     {

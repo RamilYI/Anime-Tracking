@@ -57,7 +57,7 @@ public class UserService : IUserService
         }
     }
 
-    public void AddUserTitleIds(long chatId, ICollection<int> titleIds)
+    public void AddUserTitleIds(long chatId, ICollection<int> titleIds, IDictionary<int, ICollection<string>> jobIds)
     {
         try
         {
@@ -75,12 +75,41 @@ public class UserService : IUserService
 
             user.TitleIds.Clear();
             user.TitleIds.AddRange(titleIds);
+
+            foreach (var titleId in titleIds)
+            {
+                var userTitle = new Usertitle()
+                {
+                    userid = user.Id,
+                    titleid = titleId,
+                };
+                
+                userTitle.jobids = new List<string>();
+                userTitle.jobids.AddRange(jobIds[titleId]);
+                context.Usertitles.Add(userTitle);
+            }
+            
             context.SaveChanges();
         }
         catch (Exception ex)
         {
             this.logger.LogError(ex.Message);
         }
+    }
+
+    public ICollection<string> GetDeletedUserTitles(long chatId)
+    {
+        var user = this.GetUser(chatId);
+        if (user == null)
+        {
+            return Enumerable.Empty<string>().ToList();
+        }
+        
+        var titleIds = user.TitleIds;
+        var deletedUserTitles = context.Usertitles.Where(ut => ut.userid == user.Id && !titleIds.Contains(ut.titleid)).ToList();
+        context.Usertitles.RemoveRange(deletedUserTitles);
+        context.SaveChanges();
+        return deletedUserTitles.SelectMany(t => t.jobids).ToList();
     }
 
     public UserService(UserContext context, ILogger<IUserService> logger)

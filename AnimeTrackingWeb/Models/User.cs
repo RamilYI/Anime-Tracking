@@ -13,5 +13,4 @@ public class User
     public long ChatId { get; set; }
     
     public List<int> TitleIds { get; set; }
-    
 }

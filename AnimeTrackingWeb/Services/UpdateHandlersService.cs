@@ -84,6 +84,7 @@ public class UpdateHandlersService
             if (message.WebAppData?.Data is { } titleIdValues)
             {
                 await this.CreateJobs(message, cancellationToken, titleIdValues);
+                this.RemoveOldJobs(message);
             }
 
             var sentMessage = await (message.Text?.Split(' ')[0] switch
@@ -99,7 +100,7 @@ public class UpdateHandlersService
             Console.WriteLine(e);
         }
     }
-    
+
     /// <summary>
     /// Создать миниприложение.
     /// </summary>
@@ -135,6 +136,7 @@ public class UpdateHandlersService
     private async Task CreateJobs(Message message, CancellationToken cancellationToken, string titleIdValues)
     {
         var titleIds = titleIdValues.Split(",").Select(x => x.ParseInt()).ToList();
+        var jobIds = new Dictionary<int, ICollection<string>>();
         foreach (var id in titleIds)
         {
             if (this.userService.CheckUserTitleId(message.Chat.Id, id))
@@ -147,18 +149,39 @@ public class UpdateHandlersService
             {
                 continue;
             }
-            
+
+            jobIds[id] = new List<string>();
             foreach (var episodeInformation in schedule.airingSchedule.edges.Select(x => x.node))
             {
                 var date = episodeInformation.getAiringAtUtc();
+                var currentDate = DateTime.Now;
+                if (date < currentDate)
+                {
+                    continue;
+                }
+                
                 var title = schedule.title.english ?? schedule.title.romaji ?? schedule.title.native;
-                BackgroundJob.Schedule(
+                var jobId = BackgroundJob.Schedule(
                     () => this.SendNotifications(message.Chat.Id, title,
                         episodeInformation.episode, cancellationToken), date);
+                jobIds[id].Add(jobId);
             }
         }
         
-        this.userService.AddUserTitleIds(message.Chat.Id, titleIds);
+        this.userService.AddUserTitleIds(message.Chat.Id, titleIds, jobIds);
+    }
+    
+    /// <summary>
+    /// Удалить старые джобы.
+    /// </summary>
+    /// <param name="message">Сообщение.</param>
+    private void RemoveOldJobs(Message message)
+    {
+        var deletedJobs = this.userService.GetDeletedUserTitles(message.Chat.Id);
+        foreach (var deletedJob in deletedJobs)
+        {
+            BackgroundJob.Delete(deletedJob);
+        }
     }
     
     /// <summary>
