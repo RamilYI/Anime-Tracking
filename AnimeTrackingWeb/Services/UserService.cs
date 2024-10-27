@@ -86,7 +86,7 @@ public class UserService : IUserService
                 
                 userTitle.jobids = new List<string>();
                 userTitle.jobids.AddRange(jobIds[titleId]);
-                context.Usertitles.Add(userTitle);
+                context?.usertitles?.Add(userTitle);
             }
             
             context.SaveChanges();
@@ -106,8 +106,8 @@ public class UserService : IUserService
         }
         
         var titleIds = user.TitleIds;
-        var deletedUserTitles = context.Usertitles.Where(ut => ut.userid == user.Id && !titleIds.Contains(ut.titleid)).ToList();
-        context.Usertitles.RemoveRange(deletedUserTitles);
+        var deletedUserTitles = context.usertitles.Where(ut => ut.userid == user.Id && !titleIds.Contains(ut.titleid)).ToList();
+        context.usertitles.RemoveRange(deletedUserTitles);
         context.SaveChanges();
         return deletedUserTitles.SelectMany(t => t.jobids).ToList();
     }
