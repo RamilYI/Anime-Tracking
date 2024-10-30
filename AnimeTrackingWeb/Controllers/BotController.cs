@@ -8,10 +8,22 @@ using Telegram.Bot.Types;
 
 namespace AnimeTrackingWeb.Controllers;
 
+/// <summary>
+/// Контроллер бота.
+/// </summary>
 [ApiController]
 [Route("/api/bot")]
 public class BotController : ControllerBase
 {
+    #region Методы
+
+    /// <summary>
+    /// Обработать POST запрос.
+    /// </summary>
+    /// <param name="update">Запрос.</param>
+    /// <param name="handleUpdateService">Сервис обработки запросов.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <returns>Результат.</returns>
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] Update update,
         [FromServices] UpdateHandlersService handleUpdateService,
@@ -20,4 +32,6 @@ public class BotController : ControllerBase
         await handleUpdateService.HandleUpdateAsync(update, cancellationToken);
         return Ok();
     }
+
+    #endregion
 }

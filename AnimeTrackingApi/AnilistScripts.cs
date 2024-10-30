@@ -5,6 +5,9 @@
 /// </summary>
 internal static class AnilistScripts
 {
+    /// <summary>
+    /// Урл анилиста.
+    /// </summary>
     public static readonly string Url = "https://graphql.anilist.co";
     
     /// <summary>

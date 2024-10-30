@@ -23,10 +23,8 @@ builder.Services.AddScoped<UpdateHandlersService>();
 builder.Services.AddSingleton<IAnimeTracking, AnimeTracking>();
 builder.Services.AddHostedService<ConfigureWebhook>();
 
-// Add services to the container.
 builder.Services.AddCors();
 builder.Services.AddControllers().AddNewtonsoftJson();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHangfire(configuration => configuration
@@ -42,13 +40,6 @@ builder.Services.AddTransient<IUserService, UserService>();
 
 var app = builder.Build();
 
-//using (var scope = app.Services.CreateScope())
-//{
-//    var context = scope.ServiceProvider.GetRequiredService<UserContext>();
-//    context.Database.Migrate();
-//}
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();

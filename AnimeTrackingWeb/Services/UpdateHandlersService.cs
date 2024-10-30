@@ -1,4 +1,5 @@
 using AnimeTrackingApi;
+using AnimeTrackingApi.Dto;
 using AnimeTrackingWeb.Interfaces;
 using Hangfire;
 using Microsoft.Extensions.Options;
@@ -40,6 +41,11 @@ public class UpdateHandlersService
     /// </summary>
     private readonly IOptions<BotConfiguration> configuration;
 
+    /// <summary>
+    /// Ключ для отправки коллекции тайтлов в url.
+    /// </summary>
+    private const string urlTitlesKey = "?_titles=";
+    
     #endregion
 
     #region Методы
@@ -113,7 +119,7 @@ public class UpdateHandlersService
 
         if (titleIds.Any())
         {
-            urlParams = "?_titles=" + string.Join(";", titleIds);
+            urlParams = urlTitlesKey + string.Join(";", titleIds);
         }
         
         var keyBoardButton = new KeyboardButton("Выбрать тайтлы")
@@ -150,27 +156,41 @@ public class UpdateHandlersService
                 continue;
             }
 
-            jobIds[id] = new List<string>();
-            foreach (var episodeInformation in schedule.airingSchedule.edges.Select(x => x.node))
-            {
-                var date = episodeInformation.getAiringAtUtc();
-                var currentDate = DateTime.Now;
-                if (date < currentDate)
-                {
-                    continue;
-                }
-                
-                var title = schedule.title.english ?? schedule.title.romaji ?? schedule.title.native;
-                var jobId = BackgroundJob.Schedule(
-                    () => this.SendNotifications(message.Chat.Id, title,
-                        episodeInformation.episode, cancellationToken), date);
-                jobIds[id].Add(jobId);
-            }
+            jobIds[id] = this.CreateJobsForTitle(message, cancellationToken, schedule);
         }
         
         this.userService.AddUserTitleIds(message.Chat.Id, titleIds, jobIds);
     }
-    
+
+    /// <summary>
+    /// Создать джобы для тайтла.
+    /// </summary>
+    /// <param name="message">Сообщение.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <param name="schedule">Дто расписания.</param>
+    /// <returns>Коллекция джобов.</returns>
+    private ICollection<string> CreateJobsForTitle(Message message, CancellationToken cancellationToken, ScheduleDto schedule)
+    {
+        var jobs = new List<string>();
+        foreach (var episodeInformation in schedule.airingSchedule.edges.Select(x => x.node))
+        {
+            var date = episodeInformation.getAiringAtUtc();
+            var currentDate = DateTime.Now;
+            if (date < currentDate)
+            {
+                continue;
+            }
+                
+            var title = schedule.title.english ?? schedule.title.romaji ?? schedule.title.native;
+            var jobId = BackgroundJob.Schedule(
+                () => this.SendNotifications(message.Chat.Id, title,
+                    episodeInformation.episode, cancellationToken), date);
+            jobs.Add(jobId);
+        }
+
+        return jobs;
+    }
+
     /// <summary>
     /// Удалить старые джобы.
     /// </summary>

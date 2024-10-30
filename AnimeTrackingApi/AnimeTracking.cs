@@ -15,6 +15,10 @@ public class AnimeTracking : IAnimeTracking
     /// Текущий сезон.
     /// </summary>
     private (AnimeSeason season, string date) currentSeason;
+    
+    /// <summary>
+    /// Дто сезона.
+    /// </summary>
     private SeasonDto season;
 
     /// <inheritdoc />
@@ -114,7 +118,6 @@ public class AnimeTracking : IAnimeTracking
             }
             catch (Exception ex)
             {
-                // ignored
             }
         }
 
