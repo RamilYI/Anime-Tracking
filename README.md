@@ -4,7 +4,7 @@
     <h6>Бот, уведомляющий о выходе новых серий ваших любимых онгоингов аниме.</h6>
   </div>
   <a href="https://github.com/RamilYI/Anime-Tracking">
-    <img src="https://i.imgur.com/apIsefH.jpeg" alt="MiniApp"/>
+    <img src="https://i.imgur.com/apIsefH.jpeg" width="400" alt="MiniApp"/>
   </a>
 </h3>
 
@@ -45,8 +45,8 @@
 
 ## Скриншоты
 
-<img src="https://i.imgur.com/gRt0w17.jpeg" width="500"/>
-<img src="https://i.imgur.com/2TbYQYJ.jpeg" width="500"/>
-<img src="https://i.imgur.com/6LboleQ.jpeg" width="500"/>
+<img src="https://i.imgur.com/gRt0w17.jpeg" width="400"/>
+<img src="https://i.imgur.com/2TbYQYJ.jpeg" width="400"/>
+<img src="https://i.imgur.com/6LboleQ.jpeg" width="400"/>
 
 [Ссылка на тг-бот](https://t.me/animtetrackingdemobot_fst_bot)
