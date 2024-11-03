@@ -45,8 +45,8 @@
 
 ## Скриншоты
 
-<img src="https://i.imgur.com/gRt0w17.jpeg"/>
-<img src="https://i.imgur.com/2TbYQYJ.jpeg"/>
-<img src="https://i.imgur.com/6LboleQ.jpeg"/>
+<img src="https://i.imgur.com/gRt0w17.jpeg" width="500"/>
+<img src="https://i.imgur.com/2TbYQYJ.jpeg" width="500"/>
+<img src="https://i.imgur.com/6LboleQ.jpeg" width="500"/>
 
 [Ссылка на тг-бот](https://t.me/animtetrackingdemobot_fst_bot)
