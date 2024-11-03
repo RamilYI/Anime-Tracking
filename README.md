@@ -3,9 +3,7 @@
     <h1>Anime Tracking Bot</h1>
     <h6>Бот, уведомляющий о выходе новых серий ваших любимых онгоингов аниме.</h6>
   </div>
-  <a href="https://github.com/RamilYI/Anime-Tracking">
-    <img src="https://i.imgur.com/apIsefH.jpeg" width="400" alt="MiniApp"/>
-  </a>
+  <img src="https://i.imgur.com/apIsefH.jpeg" width="400" alt="MiniApp"/>
 </h3>
 
 Телеграм-бот, который предоставляет данные об аниме-сериалах текущего сезона, в т.ч. и даёт возможность уведомляет о выходе новых серий выбранных пользователем тайтлов.
